@@ -1,0 +1,2 @@
+# CassandraShake
+cassandra desktop client
