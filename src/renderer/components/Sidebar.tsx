@@ -1,20 +1,24 @@
-import { Navbar, ScrollArea, NavbarProps, Title, ThemeIcon, Center, Accordion, Text } from '@mantine/core';
+import {
+    Navbar,
+    ScrollArea,
+    NavbarProps,
+    Title,
+    ThemeIcon,
+    Center,
+    Menu,
+    List,
+    Button,
+    Space,
+    Divider,
+    UnstyledButton,
+    Group,
+    Avatar,
+    Text,
+} from '@mantine/core';
 import _ from 'lodash';
 import { Database } from 'tabler-icons-react';
-import { Tree } from 'react-arborist';
-import React, { Ref } from 'react';
-import { NodeRendererProps } from 'react-arborist/dist/types';
-
-function Node({ innerRef, styles, data }: NodeRendererProps<any>) {
-    return (
-        <div ref={innerRef} style={styles.row}>
-            <div style={styles.indent}>{data.name}</div>
-        </div>
-    );
-}
 
 export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
-
     return (
         <Navbar {...props.nav}>
             <Navbar.Section>
@@ -26,34 +30,52 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                         Connections
                     </Title>
                 </Center>
+                <Divider mt={20} />
             </Navbar.Section>
-            <Navbar.Section grow component={ScrollArea}>
-                {/* <Accordion disableIconRotation multiple> */}
+            <Navbar.Section grow pt={12} component={ScrollArea}>
                 {_.fill(Array(50), 2).map((_v, i) => {
-                    const data = {
-                        id: i.toString(),
-                        name: `本地连接${i}`,
-                        children: [
-                            { id: i, name: i.toString() },
-                            { id: i, name: i.toString() },
-                        ],
-                    };
                     return (
-                        <Tree data={data}>{Node}</Tree>
-                        // <Accordion.Item
-                        //     key={i}
-                        //     label={<Text size='md'>{`本地连接${i}`}</Text>}
-                        //     icon={
-                        //         <ThemeIcon color="violet" variant="light" size={18}>
-                        //             <Database  />
-                        //         </ThemeIcon>
-                        //     }
-                        // >
-                        //     <h5>本地连接{i}</h5>
-                        // </Accordion.Item>
+                        <div>
+                            <UnstyledButton
+                                sx={(theme) => ({
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: theme.spacing.xs,
+                                    borderRadius: theme.radius.sm,
+                                    color:
+                                        theme.colorScheme === 'dark'
+                                            ? theme.colors.dark[0]
+                                            : theme.black,
+
+                                    '&:hover': {
+                                        backgroundColor:
+                                            theme.colorScheme === 'dark'
+                                                ? theme.colors.dark[6]
+                                                : theme.colors.gray[0],
+                                    },
+                                })}
+                            >
+                                <Group>
+                                    <Avatar size={30} color="blue">
+                                        DB
+                                    </Avatar>
+                                    <div>
+                                        <Text>本地连接{i}</Text>
+                                    </div>
+                                </Group>
+                            </UnstyledButton>
+                            {/* <Button
+                                variant="white"
+                                fullWidth
+                                leftIcon={<Database color="teal" size={16} />}
+                            >
+                                本地连接{i}
+                            </Button>
+                            <Divider /> */}
+                        </div>
                     );
                 })}
-                {/* </Accordion> */}
+                {/* </List> */}
             </Navbar.Section>
         </Navbar>
     );

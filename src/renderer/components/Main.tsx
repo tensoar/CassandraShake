@@ -23,15 +23,13 @@ export default function Main() {
                 navbar={
                     <Sidebar
                         nav={{
-                            width: { base: 300 },
+                            width: { base: 280 },
                             height: 'calc(100vh - 20px)',
                         }}
                     />
                 }
             >
-                <Container style={{ height: '100%' }}>
-                    <Panel />
-                </Container>
+                <Panel />
             </AppShell>
         </div>
     );
