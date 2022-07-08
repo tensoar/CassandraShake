@@ -1,15 +1,17 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { MemoryRouter as Router, Routes, Route, BrowserRouter, useSearchParams, HashRouter, MemoryRouter } from 'react-router-dom';
 import Main from './components/Main';
 import Panel from './components/Panel';
+import Dispatcher from './Dispatcher';
 // import icon from '../../assets/icon.svg';
 
 export default function App() {
     return (
-        <Router>
+        <HashRouter>
             <Routes>
-                <Route path="/" element={<Main />} />
+                <Route path="/" element={<Dispatcher />} />
+                <Route path="/main" element={<Main />} />
                 <Route path="/panel" element={<Panel />} />
             </Routes>
-        </Router>
+        </HashRouter>
     );
 }

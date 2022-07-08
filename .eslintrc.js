@@ -9,7 +9,9 @@ module.exports = {
         'eslint-disable-next-line': 'off',
         'react/jsx-props-no-spreading': 'off',
         'react/destructuring-assignment': 'off',
-        'react/require-default-props': 'off'
+        'react/require-default-props': 'off',
+        'prettier/prettier': 'off',
+        'react/no-array-index-key': 'off',
     },
     parserOptions: {
         ecmaVersion: 2020,

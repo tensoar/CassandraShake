@@ -3,15 +3,15 @@
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import BrowserViewManager from './BrowserViewManager';
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-    const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-    console.log(msgTemplate(arg));
-    event.reply('ipc-example', msgTemplate('pong'));
-});
+// ipcMain.on('ipc-example', async (event, arg) => {
+//     const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
+//     console.log(msgTemplate(arg));
+//     event.reply('ipc-example', msgTemplate('pong'));
+// });
 
 if (process.env.NODE_ENV === 'production') {
     const sourceMapSupport = require('source-map-support');
@@ -21,9 +21,9 @@ if (process.env.NODE_ENV === 'production') {
 const isDebug =
     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-if (isDebug) {
-    require('electron-debug')();
-}
+// if (isDebug) {
+    // require('electron-debug')();
+// }
 
 const installExtensions = async () => {
     const installer = require('electron-devtools-installer');
@@ -63,7 +63,9 @@ const createWindow = async () => {
         },
     });
 
-    mainWindow.loadURL(resolveHtmlPath('index.html'));
+    BrowserViewManager.mainWin = mainWindow;
+
+    mainWindow.loadURL(BrowserViewManager.buildMainPath());
 
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
@@ -89,9 +91,7 @@ const createWindow = async () => {
         return { action: 'deny' };
     });
 
-    // Remove this if your app does not use auto updates
-    // eslint-disable-next-line
-//   new AppUpdater();
+    BrowserViewManager.addOrFocus(124);
 };
 
 /**

@@ -35,7 +35,7 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
             <Navbar.Section grow pt={12} component={ScrollArea}>
                 {_.fill(Array(50), 2).map((_v, i) => {
                     return (
-                        <div>
+                        <div key={i}>
                             <UnstyledButton
                                 sx={(theme) => ({
                                     display: 'block',

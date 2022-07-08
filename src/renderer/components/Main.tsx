@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { ActionIcon, AppShell, Center, Container, Header, ThemeIcon } from '@mantine/core';
 import { Database } from 'tabler-icons-react';
 
@@ -6,6 +6,8 @@ import Panel from './Panel';
 import Sidebar from './Sidebar';
 
 export default function Main() {
+
+    console.log("cccc");
     return (
         <div>
             <AppShell
@@ -29,8 +31,9 @@ export default function Main() {
                     />
                 }
             >
-                <Panel />
+                {/* <Panel /> */}
             </AppShell>
         </div>
+
     );
 }

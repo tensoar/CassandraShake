@@ -184,8 +184,8 @@
         "webpack-merge": "^5.8.0"
     },
     "build": {
-        "productName": "ElectronReact",
-        "appId": "org.erb.ElectronReact",
+        "productName": "CassandraShake",
+        "appId": "wt.cassandra-shake",
         "asar": true,
         "asarUnpack": "**\\*.{node,dll}",
         "files": [
@@ -243,12 +243,9 @@
         ],
         "publish": {
             "provider": "github",
-            "owner": "electron-react-boilerplate",
-            "repo": "electron-react-boilerplate"
+            "owner": "cassandra-shake",
+            "repo": "cassandra-shake"
         }
-    },
-    "collective": {
-        "url": "https://opencollective.com/electron-react-boilerplate-594"
     },
     "devEngines": {
         "node": ">=14.x",
