@@ -4,6 +4,8 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import MenuBuilder from './menu';
 import BrowserViewManager from './BrowserViewManager';
+import ConstantUtil from './util/ConstantUtil';
+import LocalStorage from './storage/LocalStorage';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -60,12 +62,15 @@ const createWindow = async () => {
             preload: app.isPackaged
                 ? path.join(__dirname, 'preload.js')
                 : path.join(__dirname, '../../.erb/dll/preload.js'),
+            contextIsolation: false,
+            nodeIntegration: true,
+            defaultEncoding: 'utf8'
         },
     });
 
     BrowserViewManager.mainWin = mainWindow;
 
-    mainWindow.loadURL(BrowserViewManager.buildMainPath());
+    mainWindow.loadURL(BrowserViewManager.buildNormalPath(ConstantUtil.PathName.MAIN));
 
     mainWindow.on('ready-to-show', () => {
         if (!mainWindow) {
@@ -91,8 +96,15 @@ const createWindow = async () => {
         return { action: 'deny' };
     });
 
-    BrowserViewManager.addOrFocus(124);
+    LocalStorage.listenConnectionChannel(mainWindow);
+    ipcMain.on(ConstantUtil.ActionChennel.CLOSE_ADD_CONNECTION_WIN, e => {
+        if (menuBuilder.addConnectionWin != null) {
+            menuBuilder.addConnectionWin.close();
+        }
+    })
+    // BrowserViewManager.addOrFocus(124);
 };
+
 
 /**
  * Add event listeners...
@@ -109,6 +121,7 @@ app.on('window-all-closed', () => {
 app.whenReady()
     .then(() => {
         createWindow();
+        BrowserViewManager.listening();
         app.on('activate', () => {
             // On macOS it's common to re-create a window in the app when the
             // dock icon is clicked and there are no other windows open.

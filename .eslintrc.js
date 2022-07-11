@@ -12,6 +12,9 @@ module.exports = {
         'react/require-default-props': 'off',
         'prettier/prettier': 'off',
         'react/no-array-index-key': 'off',
+        "@typescript-eslint/lines-between-class-members": 'off',
+        'promise/catch-or-return': 'off',
+        'promise/always-return': 'off',
     },
     parserOptions: {
         ecmaVersion: 2020,
