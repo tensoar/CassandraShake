@@ -41,9 +41,9 @@ const installExtensions = async () => {
 };
 
 const createWindow = async () => {
-    if (isDebug) {
-        await installExtensions();
-    }
+    // if (isDebug) {
+    //     await installExtensions();
+    // }
 
     const RESOURCES_PATH = app.isPackaged
         ? path.join(process.resourcesPath, 'assets')
@@ -102,6 +102,17 @@ const createWindow = async () => {
             menuBuilder.addConnectionWin.close();
         }
     })
+    ipcMain.on(ConstantUtil.ActionChennel.CHANGE_THEME, (e, useDark: boolean) => {
+        mainWindow?.webContents.send(ConstantUtil.ActionChennel.CHANGE_THEME, useDark);
+        BrowserViewManager.useDarkTheme = useDark;
+        BrowserViewManager.viewHolder.forEach(view => {
+            view.webContents.send(ConstantUtil.ActionChennel.CHANGE_THEME, useDark);
+        });
+    });
+
+    if (isDebug) {
+        mainWindow.webContents.openDevTools();
+    }
     // BrowserViewManager.addOrFocus(124);
 };
 

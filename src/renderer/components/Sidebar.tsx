@@ -14,6 +14,7 @@ import {
     Group,
     Avatar,
     Text,
+    Switch,
 } from '@mantine/core';
 import { ipcRenderer } from 'electron';
 import _ from 'lodash';
@@ -26,10 +27,24 @@ import LocalStorageIpc from '../storage/LocalStorageIpc';
 export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
     const [currentConnectionId, setCurrentConnectionId] = useState(-1);
     const [connections, setConnections] = useState<CassandraInfo[]>([]);
+    const [useDarkTheme, setUseDarkTheme] = useState(false);
 
     useEffect(() => {
         ipcRenderer.on(ConstantUtil.BVIpcChannel.FOCUS, (e, connId: number) => {
             setCurrentConnectionId(connId);
+        });
+        ipcRenderer.on(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, (e, newId: number) => {
+            LocalStorageIpc.findOneConnection({id: newId}).then(connection => {
+                if (connection == null) {
+                    return;
+                }
+                setConnections(conns => [...conns, connection]);
+            })
+        });
+        ipcRenderer.on(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, (e, id: number) => {
+            setConnections(conns => {
+                return conns.filter(c => c.id !== id);
+            })
         });
 
         LocalStorageIpc.findManyConnection().then(conns => {
@@ -44,9 +59,13 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
         setCurrentConnectionId(connectionId);
     }
 
+    useEffect(() => {
+        ipcRenderer.send(ConstantUtil.ActionChennel.CHANGE_THEME, useDarkTheme);
+    }, [useDarkTheme]);
+
     return (
         <Navbar {...props.nav}>
-            <Navbar.Section mt={10}>
+            <Navbar.Section pt={10} pl={10}>
                 <Center inline>
                     <ThemeIcon>
                         <Database />
@@ -54,6 +73,15 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                     <Title order={5} ml={10}>
                         Connections
                     </Title>
+                    <Switch
+                        ml={60}
+                        color="dark"
+                        size="lg"
+                        onLabel='Dark'
+                        offLabel='Light'
+                        onChange={e => setUseDarkTheme(d => !d)}
+                        value="off"
+                    />
                 </Center>
                 <Divider mt={16} />
             </Navbar.Section>
@@ -62,13 +90,14 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                     return (
                         <div key={conn.id}>
                             <UnstyledButton
-                                onClick={() => openOrFocus(i)}
+                                onClick={() => openOrFocus(conn.id)}
                                 sx={(theme) => ({
                                     display: 'block',
                                     width: '100%',
                                     padding: theme.spacing.xs,
                                     borderRadius: theme.radius.sm,
-                                    backgroundColor: currentConnectionId === i ? theme.colors.cyan[2] : theme.colors.gray[1],
+                                    // eslint-disable-next-line no-nested-ternary
+                                    backgroundColor: currentConnectionId === conn.id ? (theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.cyan[2]) : (theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1]),
                                     color:
                                         theme.colorScheme === 'dark'
                                             ? theme.colors.dark[2]

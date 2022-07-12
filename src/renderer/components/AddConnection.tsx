@@ -21,7 +21,13 @@ export default function AddConnection() {
         ipcRenderer.send(ConstantUtil.ActionChennel.CLOSE_ADD_CONNECTION_WIN);
     }
 
-    return <Center pt={30} style={{width: '100%', height: '100%'}}>
+    return <Center
+        pt={30}
+        style={{width: '100%', height: '100%'}}
+        sx= {theme => ({
+            background: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
+        })}
+    >
         <Stack style={{width: '80%'}}>
             <InputWrapper
                 label="名称"

@@ -11,6 +11,7 @@ const baseUrl = isDevelopment ? `http://localhost:${port}#` : `file://${path.res
 
 export default class BrowserViewManager {
     static viewHolder: Map<number, BrowserView> = new Map<number, BrowserView>();
+    static useDarkTheme = false;
 
     static mainWin: BrowserWindow;
 
@@ -26,10 +27,11 @@ export default class BrowserViewManager {
             });
             this.viewHolder.set(connectionId, view);
             view.webContents.loadURL(this.buildConnectionPanelPath(connectionId));
+            // view.webContents.send(ConstantUtil.ActionChennel.CHANGE_THEME, this.useDarkTheme);
         }
         this.forcus(connectionId);
         if (isDebug) {
-            view.webContents.openDevTools();
+            view.webContents.openDevTools({mode: 'undocked'});
         }
     }
 
@@ -41,7 +43,7 @@ export default class BrowserViewManager {
         this.mainWin.setBrowserView(view);
         view.setAutoResize({width: true, height: true, horizontal: false, vertical: false});
         const bounds = this.mainWin.getBounds();
-        view.setBounds({x: 280, y: 0, width: bounds.width, height: bounds.height});
+        view.setBounds({x: 280, y: 0, width: bounds.width - 280, height: bounds.height});
     }
 
     static remove(connectionId: number) {
@@ -84,5 +86,8 @@ export default class BrowserViewManager {
         ipcMain.handle(ConstantUtil.BVIpcChannel.REMOVE, (event, connectionId: number) => {
             return this.remove(connectionId);
         });
+        ipcMain.handle(ConstantUtil.ActionChennel.GET_CURRENT_THEME, e => {
+            return this.useDarkTheme;
+        })
     }
 }

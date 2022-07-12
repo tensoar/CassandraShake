@@ -2,7 +2,7 @@ import path from "path";
 import os from "os";
 import fs from "fs";
 import Database from 'better-sqlite3';
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow, ipcMain, ipcRenderer } from "electron";
 import _ from "lodash";
 
 import CassandraInfo from "../entity/CassandraInfo";
@@ -84,11 +84,14 @@ export default class LocalStorage {
 
     }
 
-    static listenConnectionChannel(win: BrowserWindow) {
+    static listenConnectionChannel(mainWin: BrowserWindow) {
         ipcMain.handle(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, (e, connection: CassandraInfo) => {
-            return this.addConnection(connection);
+            const newId = this.addConnection(connection);
+            mainWin.webContents.send(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, newId);
+            return newId;
         });
         ipcMain.handle(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, (e, id: number) => {
+            mainWin.webContents.send(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, id);
             return this.deleteConnection(id);
         });
         ipcMain.handle(ConstantUtil.StorageIpcChannel.FIND_MANY_CONNECTION, (e, cond: Partial<CassandraInfo>) => {

@@ -18,10 +18,16 @@ export default class ConstantUtil {
         UPDATE_CONNECTION: 'ls:connection:update',
         DELETE_CONNECTION: 'ls:connection:delete',
         FIND_ONE_CONNECTOIN: 'ls:connection:findOne',
-        FIND_MANY_CONNECTION: 'ls:connection:findMany'
+        FIND_MANY_CONNECTION: 'ls:connection:findMany',
     }
 
     static ActionChennel = {
-        CLOSE_ADD_CONNECTION_WIN: 'ac:close_win'
+        CLOSE_ADD_CONNECTION_WIN: 'ac:close_win',
+        CHANGE_THEME: 'ac:change-theme',
+        GET_CURRENT_THEME: 'ac:current-theme'
+    }
+
+    static BradgeChannel = {
+        REFRESH_CONNECTIONS: 'bc:refresh-connection'
     }
 }

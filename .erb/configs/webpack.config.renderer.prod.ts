@@ -10,6 +10,7 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
@@ -116,6 +117,11 @@ const configuration: webpack.Configuration = {
       isBrowser: false,
       isDevelopment: process.env.NODE_ENV !== 'production',
     }),
+
+    // new MonacoWebpackPlugin({
+    //     // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+    //     languages: ['sql']
+    // })
   ],
 };
 
