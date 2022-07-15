@@ -6,6 +6,7 @@ import { MemoryRouter as Router, Routes, Route, BrowserRouter, useSearchParams, 
 
 import ConstantUtil from '../main/util/ConstantUtil';
 import AddConnection from './components/AddConnection';
+import TestTask from './components/subtask/TestTask';
 import Main from './components/Main';
 import Panel from './components/Panel';
 import Dispatcher from './Dispatcher';
@@ -31,7 +32,8 @@ export default function App() {
             <MantineProvider theme={{colorScheme: colorScheme as any}}>
                 <HashRouter>
                     <Routes>
-                        <Route path="/" element={<Dispatcher />} />
+                        {/* <Route path="/" element={<Dispatcher />} /> */}
+                        <Route path="/" element={<TestTask />} />
                         <Route path="/main" element={<Main />} />
                         <Route path="/panel" element={<Panel />} />
                         <Route path='/add_connection' element={<AddConnection />} />
