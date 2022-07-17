@@ -15,16 +15,20 @@ import {
     Avatar,
     Text,
     Switch,
+    useMantineTheme,
 } from '@mantine/core';
 import { ipcRenderer } from 'electron';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import { Database } from 'tabler-icons-react';
+
+import ThemeUtil from '../util/ThemeUtil';
 import CassandraInfo from '../../main/entity/CassandraInfo';
 import ConstantUtil from '../../main/util/ConstantUtil';
 import LocalStorageIpc from '../storage/LocalStorageIpc';
 
 export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
+    const theme = useMantineTheme();
     const [currentConnectionId, setCurrentConnectionId] = useState(-1);
     const [connections, setConnections] = useState<CassandraInfo[]>([]);
     const [useDarkTheme, setUseDarkTheme] = useState(false);
@@ -70,7 +74,13 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                     <ThemeIcon>
                         <Database />
                     </ThemeIcon>
-                    <Title order={5} ml={10}>
+                    <Title
+                        order={5}
+                        ml={10}
+                        sx={th => ({
+                            color: ThemeUtil.defaultFontColor(theme)
+                        })}
+                    >
                         Connections
                     </Title>
                     <Switch
@@ -91,13 +101,13 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                         <div key={conn.id}>
                             <UnstyledButton
                                 onClick={() => openOrFocus(conn.id)}
-                                sx={(theme) => ({
+                                sx={(th) => ({
                                     display: 'block',
                                     width: '100%',
                                     padding: theme.spacing.xs,
                                     borderRadius: theme.radius.sm,
                                     // eslint-disable-next-line no-nested-ternary
-                                    backgroundColor: currentConnectionId === conn.id ? (theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.cyan[2]) : (theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1]),
+                                    backgroundColor: currentConnectionId === conn.id ? (th.colorScheme === 'dark' ? th.colors.dark[6] : th.colors.cyan[2]) : (th.colorScheme === 'dark' ? th.colors.dark[5] : th.colors.gray[1]),
                                     color:
                                         theme.colorScheme === 'dark'
                                             ? theme.colors.dark[2]

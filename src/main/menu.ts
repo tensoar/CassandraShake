@@ -168,7 +168,7 @@ export default class MenuBuilder {
         this.addConnectionWin = new BrowserWindow({
             show: false,
             width: 600,
-            height: 400,
+            height: 600,
             icon: getAssetPath('icon.png'),
             parent: this.mainWindow,
             modal: true,

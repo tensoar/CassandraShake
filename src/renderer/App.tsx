@@ -32,8 +32,8 @@ export default function App() {
             <MantineProvider theme={{colorScheme: colorScheme as any}}>
                 <HashRouter>
                     <Routes>
-                        {/* <Route path="/" element={<Dispatcher />} /> */}
-                        <Route path="/" element={<TestTask />} />
+                        <Route path="/" element={<Dispatcher />} />
+                        {/* <Route path="/" element={<TestTask />} /> */}
                         <Route path="/main" element={<Main />} />
                         <Route path="/panel" element={<Panel />} />
                         <Route path='/add_connection' element={<AddConnection />} />

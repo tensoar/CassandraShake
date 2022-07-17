@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Center, SimpleGrid, Space, Text, Title, useMantineTheme } from "@mantine/core";
+import { Badge, Box, Button, Center, Grid, Group, List, LoadingOverlay, SimpleGrid, Space, Text, Title, useMantineTheme } from "@mantine/core";
 import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
 
@@ -7,6 +7,8 @@ import ConstantUtil from "../../../main/util/ConstantUtil";
 import LocalStorageIpc from "../../storage/LocalStorageIpc";
 import { disConnectionAction, connectAction } from "../../redux/reducer/ConnectionReducer";
 import CassandraInfo from "../../../main/entity/CassandraInfo";
+import ThemeUtil from "../../util/ThemeUtil";
+import CassandraUtil from "../../util/CassandraUtil";
 
 export default function OverviewTab() {
     const dispatch = useTypedDispath();
@@ -14,6 +16,8 @@ export default function OverviewTab() {
     const isConnected = useTypedSelector(state => state.connectionState.isConnected);
     const connectionId = useTypedSelector(state => state.connectionState.connectionId);
     const [connectionInfo, setConnectionInfo] = useState<CassandraInfo | null>(null);
+    const [keyspacesNumber, setKeyspacesNumber] = useState(-1);
+    const [isConnecting, setIsConnecting] = useState(false);
 
     useEffect(() => {
         if (connectionId > 0) {
@@ -28,11 +32,25 @@ export default function OverviewTab() {
 
     const closeConnection = async () => {
         dispatch(disConnectionAction());
+        setKeyspacesNumber(-1)
         // await ipcRenderer.invoke(ConstantUtil.BVIpcChannel.REMOVE, connectionId) as number;
     }
 
     const doConnect = async () => {
-        dispatch(connectAction(null as any));
+        if (connectionInfo === null) {
+            return;
+        }
+        setIsConnecting(true);
+        const client = await CassandraUtil.doConnection(connectionInfo);
+        if (client == null) {
+            setIsConnecting(false);
+            return;
+        }
+
+        const {keyspaces} = client.metadata;
+        setKeyspacesNumber(__ => Object.keys(keyspaces).length);
+        dispatch(connectAction(client));
+        setIsConnecting(false);
     }
 
     const deleteConnection = async() => {
@@ -42,57 +60,83 @@ export default function OverviewTab() {
     }
 
     return <Center style={{width: '100%', height: '100%', backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1]}}>
-        <SimpleGrid cols={2} pt={60}>
-            <Box style={{display: 'flex'}}>
+        <LoadingOverlay visible={isConnecting} />
+        <Grid pt={60} style={{width: '80%'}}>
+            <Grid.Col span={2}>
                 <Title
                     order={4}
                     sx={th => ({
-                        color: th.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.dark[4]
+                        color: ThemeUtil.defaultFontColor(th)
                     })}
                     // color={theme.colorScheme === "dark" ? theme.colors.gray[3] : theme.colors.red[4]}
                 >
                     名称:
                 </Title>
-                <Space w="md" />
+            </Grid.Col>
+            <Grid.Col span={10}>
                 <Text
-                    color={theme.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.dark[4]}
+                    color={ThemeUtil.defaultFontColor(theme)}
                 >
                     {connectionInfo && connectionInfo.name}
                 </Text>
-            </Box>
-            <Space h="sm" />
-            <Box style={{display: 'flex'}}>
+            </Grid.Col>
+
+            <Grid.Col span={2}>
                 <Title
                     order={4}
                     sx={th => ({
-                        color: th.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.dark[4]
+                        color: ThemeUtil.defaultFontColor(th)
                     })}
                 >
                     主机:
                 </Title>
-                <Space w="md" />
-                <Text
-                    color={theme.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.dark[4]}
-                >
-                    {connectionInfo && connectionInfo.hosts}
-                </Text>
-            </Box>
-            <Space h="sm" />
-            <Box style={{display: 'flex'}}>
+            </Grid.Col>
+            <Grid.Col span={10}>
+                {connectionInfo && connectionInfo.hosts.split(',').map(h => (
+                    <List>
+                        <List.Item>
+                            {h}
+                        </List.Item>
+                    </List>
+                ))}
+            </Grid.Col>
+
+            <Grid.Col span={2}>
                 <Title
                     order={4}
                     sx={th => ({
-                        color: th.colorScheme === "dark" ? theme.colors.gray[6] : theme.colors.dark[4]
+                        color: ThemeUtil.defaultFontColor(th)
                     })}
                 >
                     状态:
                 </Title>
-                <Space w="md" />
+            </Grid.Col>
+            <Grid.Col span={10}>
                 <Badge color={isConnected ? "teal" : "gray"} >{isConnected ? '已连接' : '未连接'}</Badge>
-            </Box>
-            <Space h="sm" />
-            {isConnected ? <Button variant="outline" color="red" onClick={closeConnection}>关闭</Button> : <Button  variant="outline" onClick={doConnect}>连 接</Button>}
-            <Button variant="outline" color="red" onClick={deleteConnection}>删 除</Button>
-        </SimpleGrid>
+            </Grid.Col>
+
+            <Grid.Col span={4}>
+                <Title
+                    order={4}
+                    sx={th => ({
+                        color: ThemeUtil.defaultFontColor(th)
+                    })}
+                >
+                    数据库数量:
+                </Title>
+            </Grid.Col>
+            <Grid.Col span={6}>
+                <Text color={ThemeUtil.defaultFontColor(theme)}>{keyspacesNumber < 0 ? "-" : keyspacesNumber}</Text>
+            </Grid.Col>
+
+            <Grid.Col span={12} mt={20}>
+                <Center>
+                    <Group>
+                        {isConnected ? <Button variant="outline" color="red" onClick={closeConnection}>关闭</Button> : <Button  variant="outline" onClick={doConnect} disabled={isConnecting}>连 接</Button>}
+                        <Button variant="outline" color="red" onClick={deleteConnection} disabled={isConnecting}>删 除</Button>
+                    </Group>
+                </Center>
+            </Grid.Col>
+        </Grid>
     </Center>
 }
