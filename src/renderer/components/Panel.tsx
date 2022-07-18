@@ -1,5 +1,8 @@
-import { Grid, Tabs, useMantineTheme } from '@mantine/core';
+import { Button, Grid, Group, useMantineTheme, Text } from '@mantine/core';
 import { useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
+import Tabs, {TabPane} from 'rc-tabs';
+
 import { Command, Home } from 'tabler-icons-react';
 
 import { useTypedDispath, useTypedSelector } from '../redux/HooksWrapper';
@@ -30,26 +33,58 @@ export default function Panel() {
                 }}
             >
                 <Grid.Col span={isConnected ? 18 : 24}>
-                    <Tabs>
+                    <Tabs
+                        defaultActiveKey='1'
+                        tabPosition='top'
+                        renderTabBar={(props, DefaultTabBar) => {
+                            return <DefaultTabBar
+                                {...props}
+                                style={{
+                                    height: 200
+                                }}
+                            />
+                        }}
+                    >
+                        <TabPane
+                            tab={<Text>Home</Text>}
+                            key="1"
+                        >
+                            <OverviewTab />
+                        </TabPane>
+                        <TabPane tab="Command" key="2">
+                            <OverviewTab />
+                        </TabPane>
+                        <TabPane tab="Filter" key="3">
+                            <OverviewTab />
+                        </TabPane>
+                    </Tabs>
+                    {/* {tabKey === 'tab-overview' && <OverviewTab />}
+                    {tabKey === 'tab-command' && <CommandTab />}
+                    {tabKey === 'tab-filter' && <FilterTab />} */}
+                    {/* <Tabs
+                    >
                         <Tabs.Tab
+                            key="tab-overview"
                             label="Home"
                             icon={<Home size={14} />}
                         >
                             <OverviewTab />
                         </Tabs.Tab>
                         <Tabs.Tab
+                            key="tab-coomand"
                             label="Command"
                             icon={<Command size={14} />}
                         >
                             <CommandTab />
                         </Tabs.Tab>
                         <Tabs.Tab
+                            key="tab-filter"
                             label="Filter"
                             icon={<Command size={14} />}
                         >
                             <FilterTab />
                         </Tabs.Tab>
-                    </Tabs>
+                    </Tabs> */}
                 </Grid.Col>
                 <Grid.Col span={isConnected ? 6 : 0}>
                     <DatabaseTree />

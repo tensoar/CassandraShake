@@ -34,28 +34,37 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
     const [useDarkTheme, setUseDarkTheme] = useState(false);
 
     useEffect(() => {
-        ipcRenderer.on(ConstantUtil.BVIpcChannel.FOCUS, (e, connId: number) => {
+        const focusCb = (e: any, connId: number) => {
             setCurrentConnectionId(connId);
-        });
-        ipcRenderer.on(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, (e, newId: number) => {
+        }
+        const addConnectionCb = (e: any, newId: number) => {
             LocalStorageIpc.findOneConnection({id: newId}).then(connection => {
                 if (connection == null) {
                     return;
                 }
                 setConnections(conns => [...conns, connection]);
             })
-        });
-        ipcRenderer.on(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, (e, id: number) => {
+        };
+        const deleteConnectionCb = (e, id: number) => {
             setConnections(conns => {
                 return conns.filter(c => c.id !== id);
-            })
-        });
+            });
+        };
+        ipcRenderer.on(ConstantUtil.BVIpcChannel.FOCUS, focusCb);
+        ipcRenderer.on(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, addConnectionCb);
+        ipcRenderer.on(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, deleteConnectionCb);
 
         LocalStorageIpc.findManyConnection().then(conns => {
             if (conns !== null) {
                 setConnections(__ => conns);
             }
         });
+
+        return () => {
+            ipcRenderer.removeListener(ConstantUtil.BVIpcChannel.FOCUS, focusCb);
+            ipcRenderer.removeListener(ConstantUtil.StorageIpcChannel.ADD_CONNECTION, addConnectionCb);
+            ipcRenderer.removeListener(ConstantUtil.StorageIpcChannel.DELETE_CONNECTION, deleteConnectionCb);
+        };
     }, []);
 
     const openOrFocus = (connectionId: number) => {
