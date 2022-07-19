@@ -1,9 +1,9 @@
-import { Button, Grid, Group, useMantineTheme, Text } from '@mantine/core';
+import { Button, Grid, Group, useMantineTheme, Text, Divider, Box } from '@mantine/core';
 import { useSearchParams } from 'react-router-dom';
 import { useState } from 'react';
 import Tabs, {TabPane} from 'rc-tabs';
 
-import { Command, Home } from 'tabler-icons-react';
+import { Command, Container, Home, Leaf, Terminal } from 'tabler-icons-react';
 
 import { useTypedDispath, useTypedSelector } from '../redux/HooksWrapper';
 
@@ -12,6 +12,9 @@ import CommandTab from './connection/CommandTab';
 import FilterTab from './connection/FilterTab';
 import DatabaseTree from './connection/DatabaseTree';
 import { setConnectionIdAction } from '../redux/reducer/ConnectionReducer';
+import ThemeUtil from '../util/ThemeUtil';
+
+// import 'rc-tabs/assets/index.css'
 
 export default function Panel() {
     const [searchParams] = useSearchParams();
@@ -20,6 +23,14 @@ export default function Panel() {
     const connectionId = parseInt(searchParams.get('connectionId') || '0', 10);
     const dispatch = useTypedDispath();
     dispatch(setConnectionIdAction(connectionId));
+    const [currentTabKey, setCurrentTabKey] = useState('1');
+
+    const getTabButtonColor = (key: string) => {
+        if (theme.colorScheme === 'dark') {
+            return key === currentTabKey ? 'default' : 'gray'
+        }
+        return key === currentTabKey ? 'default' : 'dark';
+    }
 
     return (
         <div
@@ -28,65 +39,133 @@ export default function Panel() {
             <Grid
                 columns={24}
                 style={{
-                    height: '100%', width: '100%',
+                    height: '100%',
+                    width: '100%',
                     background: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
                 }}
             >
                 <Grid.Col span={isConnected ? 18 : 24}>
+                    <Box
+                        style={{
+                            borderBottomStyle: 'solid',
+                            borderWidth: 1,
+                            borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[3]
+                        }}
+                    >
+                        <Group
+                            spacing='xs'
+                            style={{
+                                // borderBottom: 2,
+                                // borderBottomColor: 'blue'
+                            }}
+                        >
+                            <Button
+                                onClick={() => setCurrentTabKey('1')}
+                                variant="subtle"
+                                color={getTabButtonColor('1')}
+                                leftIcon={<Home size={16} />}
+                                style={{
+                                    borderBottomStyle: 'solid',
+                                    borderTopWidth: 0,
+                                    borderRightWidth: 0,
+                                    borderLeftWidth: 0,
+                                    borderBottomWidth: currentTabKey === '1' ? 2 : 0,
+                                    borderColor: theme.colors.blue[3],
+                                    borderRadius: 0
+                                }}
+                            >
+                                Home
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentTabKey('2')}
+                                variant="subtle"
+                                color={getTabButtonColor('2')}
+                                leftIcon={<Terminal size={16} />}
+                                style={{
+                                    borderBottomStyle: 'solid',
+                                    borderTopWidth: 0,
+                                    borderRightWidth: 0,
+                                    borderLeftWidth: 0,
+                                    borderBottomWidth: currentTabKey === '2' ? 2 : 0,
+                                    borderColor: theme.colors.blue[3],
+                                    borderRadius: 0
+                                }}
+                            >
+                                Command
+                            </Button>
+                            <Button
+                                onClick={() => setCurrentTabKey('3')}
+                                variant="subtle"
+                                color={getTabButtonColor('3')}
+                                leftIcon={<Leaf size={15} />}
+                                style={{
+                                    borderBottomStyle: 'solid',
+                                    borderTopWidth: 0,
+                                    borderRightWidth: 0,
+                                    borderLeftWidth: 0,
+                                    borderBottomWidth: currentTabKey === '3' ? 2 : 0,
+                                    borderColor: theme.colors.blue[3],
+                                    borderRadius: 0
+                                }}
+                            >
+                                Filter
+                            </Button>
+                        </Group>
+                    </Box>
                     <Tabs
                         defaultActiveKey='1'
                         tabPosition='top'
+                        activeKey={currentTabKey}
                         renderTabBar={(props, DefaultTabBar) => {
-                            return <DefaultTabBar
-                                {...props}
-                                style={{
-                                    height: 200
-                                }}
-                            />
+                            return <></>
+                        }}
+                        style={{
+                            paddingTop: 10,
+                            paddingRight: 10
                         }}
                     >
                         <TabPane
-                            tab={<Text>Home</Text>}
+                            tab={<Text
+                                size='md'
+                                color={ThemeUtil.defaultFontColor(theme)}
+                                style={{
+                                    backgroundColor: ThemeUtil.defaultBackgroudColor(theme),
+                                    borderWidth: 0
+                                }}
+                            >
+                                Home
+                            </Text>}
                             key="1"
                         >
                             <OverviewTab />
                         </TabPane>
-                        <TabPane tab="Command" key="2">
-                            <OverviewTab />
-                        </TabPane>
-                        <TabPane tab="Filter" key="3">
-                            <OverviewTab />
-                        </TabPane>
-                    </Tabs>
-                    {/* {tabKey === 'tab-overview' && <OverviewTab />}
-                    {tabKey === 'tab-command' && <CommandTab />}
-                    {tabKey === 'tab-filter' && <FilterTab />} */}
-                    {/* <Tabs
-                    >
-                        <Tabs.Tab
-                            key="tab-overview"
-                            label="Home"
-                            icon={<Home size={14} />}
-                        >
-                            <OverviewTab />
-                        </Tabs.Tab>
-                        <Tabs.Tab
-                            key="tab-coomand"
-                            label="Command"
-                            icon={<Command size={14} />}
+                        <TabPane
+                            tab={<Text>Command</Text>}
+                            key="2"
                         >
                             <CommandTab />
-                        </Tabs.Tab>
-                        <Tabs.Tab
-                            key="tab-filter"
-                            label="Filter"
-                            icon={<Command size={14} />}
+                        </TabPane>
+                        <TabPane
+                            tab={<Text>Filter</Text>}
+                            key="3"
                         >
                             <FilterTab />
-                        </Tabs.Tab>
-                    </Tabs> */}
+                        </TabPane>
+                    </Tabs>
                 </Grid.Col>
-                <Grid.Col span={isConnected ? 6 : 0}>
+                <Grid.Col
+                    span={isConnected ? 6 : 0}
+                    style={{
+                        height: '100%',
+                        overflow: 'auto',
+                        borderWidth: 1,
+                        borderTopWidth: 0,
+                        borderRightWidth: 0,
+                        borderBottomWidth: 0,
+                        borderStyle: 'solid',
+                        borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[3],
+                    }}
+                >
                     <DatabaseTree />
                 </Grid.Col>
             </Grid>

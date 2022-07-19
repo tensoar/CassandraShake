@@ -15,6 +15,10 @@ module.exports = {
         "@typescript-eslint/lines-between-class-members": 'off',
         'promise/catch-or-return': 'off',
         'promise/always-return': 'off',
+        'no-else-return': 'off',
+        'no-restricted-syntax': 'off',
+        'no-await-in-loop': 'off',
+        'consistent-return': 'off'
     },
     parserOptions: {
         ecmaVersion: 2020,
