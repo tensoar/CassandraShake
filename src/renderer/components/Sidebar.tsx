@@ -20,7 +20,7 @@ import {
 import { ipcRenderer } from 'electron';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
-import { Database } from 'tabler-icons-react';
+import { Activity, Database, Seeding } from 'tabler-icons-react';
 
 import ThemeUtil from '../util/ThemeUtil';
 import CassandraInfo from '../../main/entity/CassandraInfo';
@@ -34,10 +34,10 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
     const [useDarkTheme, setUseDarkTheme] = useState(false);
 
     useEffect(() => {
-        const focusCb = (e: any, connId: number) => {
+        const focusCb = (_e: any, connId: number) => {
             setCurrentConnectionId(connId);
         }
-        const addConnectionCb = (e: any, newId: number) => {
+        const addConnectionCb = (_e: any, newId: number) => {
             LocalStorageIpc.findOneConnection({id: newId}).then(connection => {
                 if (connection == null) {
                     return;
@@ -45,7 +45,7 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                 setConnections(conns => [...conns, connection]);
             })
         };
-        const deleteConnectionCb = (e, id: number) => {
+        const deleteConnectionCb = (_e: any, id: number) => {
             setConnections(conns => {
                 return conns.filter(c => c.id !== id);
             });
@@ -81,12 +81,12 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
             <Navbar.Section pt={10} pl={10}>
                 <Center inline>
                     <ThemeIcon>
-                        <Database />
+                        <Activity />
                     </ThemeIcon>
                     <Title
                         order={5}
                         ml={10}
-                        sx={th => ({
+                        sx={_th => ({
                             color: ThemeUtil.defaultFontColor(theme)
                         })}
                     >
@@ -98,14 +98,14 @@ export default function Sidebar(props: { nav: Partial<NavbarProps> }) {
                         size="lg"
                         onLabel='Dark'
                         offLabel='Light'
-                        onChange={e => setUseDarkTheme(d => !d)}
+                        onChange={_e => setUseDarkTheme(d => !d)}
                         value="off"
                     />
                 </Center>
                 <Divider mt={16} />
             </Navbar.Section>
             <Navbar.Section grow pt={12} component={ScrollArea}>
-                {connections.map((conn, i) => {
+                {connections.map((conn, _i) => {
                     return (
                         <div key={conn.id}>
                             <UnstyledButton

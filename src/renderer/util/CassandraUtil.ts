@@ -4,7 +4,6 @@ import CassandraInfo from "../../main/entity/CassandraInfo";
 
 export default class CassandraUtil {
     static async doConnection(cassandraInfo: CassandraInfo) {
-
         try {
             const client = new CassandraClient({
                 contactPoints: cassandraInfo.hosts.split(','),
@@ -21,5 +20,16 @@ export default class CassandraUtil {
             console.log("连接失败");
             return null;
         }
+    }
+
+    static async executeCql(client: CassandraClient, cqlStr: string) {
+        const cql = cqlStr.split('\n').filter(s => !s.trim().startsWith('--')).join('\n');
+        const cqls = cql.split(';').map(c => c.trim()).filter(c => c.length > 0);
+        let result;
+        for (const c of cqls) {
+            console.log(c)
+            result = await client.execute(c.replace(";", '').trim());
+        }
+        return result?.rows || [];
     }
 }
