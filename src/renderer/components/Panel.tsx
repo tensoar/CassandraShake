@@ -33,7 +33,7 @@ export default function Panel() {
     }
 
     return (
-        <div
+        <Box
             style={{ height: '100vh', width: '100%'}}
         >
             <Grid
@@ -42,9 +42,16 @@ export default function Panel() {
                     height: '100%',
                     width: '100%',
                     background: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[1],
+                    opacity: 1,
                 }}
             >
-                <Grid.Col span={isConnected ? 18 : 24}>
+                <Grid.Col
+                    span={isConnected ? 18 : 24}
+                    style={{
+                        height: '100%',
+                        width: '100%',
+                    }}
+                >
                     <Box
                         style={{
                             borderBottomStyle: 'solid',
@@ -121,7 +128,7 @@ export default function Panel() {
                         }}
                         style={{
                             paddingTop: 10,
-                            paddingRight: 10
+                            paddingRight: 10,
                         }}
                     >
                         <TabPane
@@ -158,6 +165,7 @@ export default function Panel() {
                     style={{
                         height: '100%',
                         overflow: 'auto',
+                        width: '90%',
                         borderWidth: 1,
                         borderTopWidth: 0,
                         borderRightWidth: 0,
@@ -165,10 +173,30 @@ export default function Panel() {
                         borderStyle: 'solid',
                         borderColor: theme.colorScheme === 'dark' ? theme.colors.dark[3] : theme.colors.gray[3],
                     }}
+                    sx={th => ({
+                        // scrollbarWidth: "thin",
+                        '::-webkit-scrollbar': {
+                            width: '14px',
+                            height: '8px',
+                        },
+                        '::-webkit-scrollbar-corner': {
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[4]: theme.colors.blue[0]
+                        },
+                        "::-webkit-scrollbar-thumb": {
+                            // 滚动条
+                            backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[7]: theme.colors.gray[4],
+                            borderRadius: 20
+                        },
+                        '::-webkit-scrollbar-track': {
+                            // 滚动区域
+                            background: theme.colorScheme === 'dark' ? theme.colors.dark[4]: theme.colors.blue[0],
+                            borderRadius: 20
+                         }
+                    })}
                 >
                     <DatabaseTree />
                 </Grid.Col>
             </Grid>
-        </div>
+        </Box>
     );
 }

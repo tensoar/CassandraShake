@@ -1,12 +1,13 @@
-import { Center, useMantineTheme, Text, Button, Group, UnstyledButton, Badge, Slider } from "@mantine/core";
+import { Center, useMantineTheme, Text, Button, Group, UnstyledButton, Badge, Slider, Box, Stack } from "@mantine/core";
 import MonacoEditor from "react-monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { editor as OriginMonacoEditor } from 'monaco-editor';
-import { Ballon, Box, Run } from "tabler-icons-react";
+import { Ballon, Run } from "tabler-icons-react";
 import { types } from "cassandra-driver";
 
 import { useTypedSelector } from "../../redux/HooksWrapper";
 import CassandraUtil from "../../util/CassandraUtil";
+import PaginationTable from "./PaginationTable";
 
 export default function CommandTab() {
     const theme = useMantineTheme();
@@ -15,7 +16,11 @@ export default function CommandTab() {
     const [cqlCode, setCqlCode] = useState('');
     const [cqlEditor, setCqlEditor] = useState<OriginMonacoEditor.IStandaloneCodeEditor | null>(null);
     const editorRef = useRef<OriginMonacoEditor.IStandaloneCodeEditor | null>(null);
-    const [resultRows, setResultRows] = useState<types.Row[]>([]);
+    const [resultRows, setResultRows] = useState<Record<string, any>[]>([]);
+    const [executeErr, setExecuteErr] = useState<any | null>(null);
+    const [executing, setExecuting] = useState(false);
+    const [execResultType, setExecResultType] = useState<'table' | 'message'>('table');
+    const [execResultMessage, setExecResultMessage] = useState('');
 
     useEffect(() => {
         editorRef.current = cqlEditor;
@@ -44,16 +49,26 @@ export default function CommandTab() {
         if (!cql) {
             return;
         }
+        setExecuting(true);
         try {
             const rows = await CassandraUtil.executeCql(client, cql);
-            setResultRows(__ => rows);
-            console.log('rows = ', rows);
+            if (typeof rows === 'boolean') {
+
+            } else {
+                setResultRows(__ => rows);
+                console.log('rows = ', rows);
+            }
+            setExecuteErr(null);
         } catch (e) {
             console.log(e);
+            setResultRows(__ => []);
+            setExecuteErr(e);
+        } finally {
+            setExecuting(false);
         }
     }
 
-    return isConnected ? <div style={{width: '100%', height: '100%', paddingLeft: 10, paddingRight: 10}}>
+    return isConnected ? <Stack spacing="sm" style={{width: '100%', height: '100%', paddingLeft: 10, paddingRight: 10}}>
         <Group ml={10}>
             <Button
                 compact
@@ -63,6 +78,8 @@ export default function CommandTab() {
                 size="xs"
                 leftIcon={<Run size={14} />}
                 onClick={executeCql}
+                disabled={executing}
+                loading={executing}
             >
                 Execute
             </Button>
@@ -91,14 +108,20 @@ export default function CommandTab() {
                 onChange={(newValue, e) => setCqlCode(newValue)}
             />
         </Center>
-        {/* <Box
+        <Box
+            pb={10}
             style={{
-                width: '100%'
+                width: '100%',
+                height: 500,
+                // overflow: 'auto',
             }}
         >
-
-        </Box> */}
-    </div>
+            <PaginationTable
+                rows={resultRows}
+                error={executeErr}
+            />
+        </Box>
+    </Stack>
     :
     <Center style={{width: '100%', height: '100%'}}>
         <Text color={theme.colorScheme === 'dark' ? theme.colors.gray[6] : theme.colors.dark[4]}>未连接</Text>
