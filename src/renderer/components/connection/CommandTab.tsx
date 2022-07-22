@@ -1,8 +1,8 @@
-import { Center, useMantineTheme, Text, Button, Group, UnstyledButton, Badge, Slider, Box, Stack } from "@mantine/core";
+import { Center, useMantineTheme, Text, Button, Group, UnstyledButton, Badge, Slider, Box, Stack, Alert, LoadingOverlay } from "@mantine/core";
 import MonacoEditor from "react-monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { editor as OriginMonacoEditor } from 'monaco-editor';
-import { Ballon, Run } from "tabler-icons-react";
+import { AlertCircle, Ballon, Run } from "tabler-icons-react";
 import { types } from "cassandra-driver";
 
 import { useTypedSelector } from "../../redux/HooksWrapper";
@@ -17,10 +17,41 @@ export default function CommandTab() {
     const [cqlEditor, setCqlEditor] = useState<OriginMonacoEditor.IStandaloneCodeEditor | null>(null);
     const editorRef = useRef<OriginMonacoEditor.IStandaloneCodeEditor | null>(null);
     const [resultRows, setResultRows] = useState<Record<string, any>[]>([]);
-    const [executeErr, setExecuteErr] = useState<any | null>(null);
     const [executing, setExecuting] = useState(false);
-    const [execResultType, setExecResultType] = useState<'table' | 'message'>('table');
-    const [execResultMessage, setExecResultMessage] = useState('');
+    const [execResultType, setExecResultType] = useState<'table' | 'message'>('message');
+
+    const [messageResult, setMessageResult] = useState<JSX.Element>(
+        <Alert icon={<AlertCircle size={16} />} title="No Data" color="gray">
+            <Stack>
+                <Text>There is no data ...</Text>
+            </Stack>
+        </Alert>
+    );
+
+    const genMessageResult = (type: 'err' | 'sucess' | 'empty', err?: any) => {
+        if (type === 'empty') {
+            return <Alert icon={<AlertCircle size={16} />} title="No Data" color="gray">
+                <Stack>
+                    <Text>There is no data ...</Text>
+                </Stack>
+            </Alert>
+        } else if (type === 'sucess') {
+            return <Alert icon={<AlertCircle size={16} />} title="Success" color="green">
+                <Stack>
+                    <Text>Execute success ...</Text>
+                </Stack>
+            </Alert>
+        } else {
+            return <Alert icon={<AlertCircle size={16} />} title="Error" color="red">
+                <Stack>
+                    <Text>{err.message}</Text>
+                    <Text>{err.stack}</Text>
+                    <Text>Error Query: {err.query}</Text>
+                </Stack>
+            </Alert>
+        }
+
+    }
 
     useEffect(() => {
         editorRef.current = cqlEditor;
@@ -53,16 +84,17 @@ export default function CommandTab() {
         try {
             const rows = await CassandraUtil.executeCql(client, cql);
             if (typeof rows === 'boolean') {
-
+                setExecResultType('message');
+                setMessageResult(genMessageResult('sucess'));
             } else {
+                setExecResultType('table');
                 setResultRows(__ => rows);
                 console.log('rows = ', rows);
             }
-            setExecuteErr(null);
         } catch (e) {
             console.log(e);
-            setResultRows(__ => []);
-            setExecuteErr(e);
+            setExecResultType('message');
+            setMessageResult(genMessageResult('err', e));
         } finally {
             setExecuting(false);
         }
@@ -116,10 +148,14 @@ export default function CommandTab() {
                 // overflow: 'auto',
             }}
         >
-            <PaginationTable
-                rows={resultRows}
-                error={executeErr}
-            />
+            <LoadingOverlay visible={executing} />
+            {
+                execResultType === 'message' ? messageResult
+                :
+                <PaginationTable
+                    rows={resultRows}
+                />
+            }
         </Box>
     </Stack>
     :

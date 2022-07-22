@@ -6,7 +6,6 @@ import ThemeUtil from "../../util/ThemeUtil";
 
 type Props = {
     rows:Record<string, any>[],
-    error: any
 }
 
 export default function PaginationTable(props: Props) {
@@ -135,13 +134,8 @@ export default function PaginationTable(props: Props) {
         </Group>
     </Box>:
     <Box>
-        <Alert icon={<AlertCircle size={16} />} title={props.error ? "Error" : "No Data"} color={props.error ? "red" :"gray"}>
-            {props.error ? <Stack>
-                <Text>{props.error.message}</Text>
-                <Text>{props.error.stack}</Text>
-                <Text>Error Query: {props.error.query}</Text>
-            </Stack>
-             : "There is no data ..."}
+        <Alert icon={<AlertCircle size={16} />} title="Empty" color="gray">
+            Result is empty ...
         </Alert>
     </Box>
 }

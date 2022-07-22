@@ -1,7 +1,8 @@
-import { Accordion, Box, Button, Center, List, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
+import { Accordion, Badge, Box, Button, Center, Code, Group, List, Text, ThemeIcon, Title, useMantineTheme } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { CirclePlus, Columns, Database, Key, Plant2, Refresh, Table as TableIcon } from "tabler-icons-react";
 import { useTypedDispath, useTypedSelector } from "../../redux/HooksWrapper";
+import CassandraUtil from "../../util/CassandraUtil";
 import ThemeUtil from "../../util/ThemeUtil";
 
 interface ColumnInfo {
@@ -141,33 +142,46 @@ export default function DatabaseTree() {
                 compact
                 onClick={scanKeyspaces}
                 disabled={refreshingTree}
+                loading={refreshingTree}
                 style={{
                     border: 0
                 }}
             />
         </Center>
-        <Accordion
-            icon={<Database size={16} />}
-            multiple
-        >
-            {keyspaces?.map(keyspace => {
-                return <Accordion.Item key={keyspace.name} label={keyspace.name}>
-                    <Accordion icon={<TableIcon size={16} />} multiple>
-                        {keyspace.tables.map(table => {
-                            return <Accordion.Item key={table.name} label={table.name}>
-                                <List>
-                                    {table.colums.map(column => {
-                                        return <List.Item icon={getColumnIcon(column)} key={column.name}>
-                                            {column.name}
-                                        </List.Item>
-                                    })}
-                                </List>
-                            </Accordion.Item>
-                        })}
-                    </Accordion>
-                </Accordion.Item>
-            })}
-        </Accordion>
+        <Box>
+            <Accordion
+                icon={<Database size={16} />}
+                multiple
+            >
+                {keyspaces?.map(keyspace => {
+                    return <Accordion.Item key={keyspace.name} label={keyspace.name}>
+                        <Accordion icon={<TableIcon size={16} />} multiple>
+                            {keyspace.tables.map(table => {
+                                return <Accordion.Item key={table.name} label={table.name}>
+                                    <List>
+                                        {table.colums.map(column => {
+                                            return <List.Item icon={getColumnIcon(column)} key={column.name}>
+                                                <Group spacing="xs">
+                                                    <Badge size="xs">{CassandraUtil.getTypeNameByCode(column.type)}</Badge>
+                                                    <Code
+                                                        style={{
+                                                            fontSize: 16,
+                                                            backgroundColor: ThemeUtil.defaultBackgroudColor(theme)
+                                                        }}
+                                                    >
+                                                        {column.name}
+                                                    </Code>
+                                                </Group>
+                                            </List.Item>
+                                        })}
+                                    </List>
+                                </Accordion.Item>
+                            })}
+                        </Accordion>
+                    </Accordion.Item>
+                })}
+            </Accordion>
+        </Box>
     </Box>
     :
     <></>
