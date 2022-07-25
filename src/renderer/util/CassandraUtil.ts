@@ -1,7 +1,9 @@
-import { Client as CassandraClient } from "cassandra-driver";
+import { Client as CassandraClient, Client } from "cassandra-driver";
+import _ from "lodash";
 
 import CassandraInfo from "../../main/entity/CassandraInfo";
 import DateUtil from "./DateUtil";
+import { KeyspaceInfo, ColumnInfo, TableInfo } from './TypeUtil';
 
 export default class CassandraUtil {
     static async doConnection(cassandraInfo: CassandraInfo) {
@@ -56,6 +58,31 @@ export default class CassandraUtil {
         } else {
             return true;
         }
+    }
+
+    static async getKeyspaces(client: CassandraClient): Promise<string[]> {
+        const keyspaces: string[] = [];
+        try {
+            if (_.isNil(client)) {
+                return keyspaces;
+            }
+            const metaKeyspaces = client.metadata.keyspaces as {[key: string]: any};
+            for (const key of Object.keys(metaKeyspaces)) {
+                keyspaces.push(key);
+            }
+            return keyspaces;
+        } catch(e) {
+            console.log(e)
+        }
+        return keyspaces;
+    }
+
+    static async getTables(client: CassandraClient, keyspace: string) {
+        const tableNames = await client?.execute(`SELECT table_name FROM system_schema.tables WHERE keyspace_name = '${keyspace}'`);
+        if (_.isNil(tableNames)) {
+            return [];
+        }
+        return tableNames.rows.map(r => r.table_name);
     }
 
     static typeCode = {
