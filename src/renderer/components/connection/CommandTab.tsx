@@ -3,7 +3,6 @@ import MonacoEditor from "react-monaco-editor";
 import { useEffect, useRef, useState } from "react";
 import { editor as OriginMonacoEditor } from 'monaco-editor';
 import { AlertCircle, Ballon, Run } from "tabler-icons-react";
-import { types } from "cassandra-driver";
 
 import { useTypedSelector } from "../../redux/HooksWrapper";
 import CassandraUtil from "../../util/CassandraUtil";

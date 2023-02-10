@@ -77,12 +77,25 @@ export default class CassandraUtil {
         return keyspaces;
     }
 
-    static async getTables(client: CassandraClient, keyspace: string) {
+    static async getTables(client: CassandraClient, keyspace: string): Promise<string[]> {
         const tableNames = await client?.execute(`SELECT table_name FROM system_schema.tables WHERE keyspace_name = '${keyspace}'`);
         if (_.isNil(tableNames)) {
             return [];
         }
         return tableNames.rows.map(r => r.table_name);
+    }
+
+    static async getColumnsOfTable (cassandraClient: CassandraClient, keyspaceName: string, tableName: string) {
+        const table = await cassandraClient?.metadata.getTable(keyspaceName, tableName);
+        const partitionKeys = table?.partitionKeys.map(p => p.name) as string[];
+        const clusterKeys = table?.clusteringKeys.map(c => c.name) as string[];
+        const colums: ColumnInfo[] = table?.columns.map(col => ({
+            name: col.name,
+            type: col.type.code,
+            isClusteringKeys: clusterKeys.includes(col.name),
+            isPartitionKey: partitionKeys.includes(col.name)
+        })) as unknown as ColumnInfo[];
+        return colums;
     }
 
     static typeCode = {
